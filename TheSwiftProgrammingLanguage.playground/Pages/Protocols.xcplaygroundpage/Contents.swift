@@ -78,3 +78,154 @@ var ncc1701 = Starship(name: "Enterprise", prefix: "USS")
 //
 
 /*Method Requirements*/
+
+//Protocols can require specific instance methods and type methods to be implemented by conforming types. These methods are written as part of the protocol’s definition in exactly the same way as for normal instance and type methods, but without curly braces or a method body. Variadic parameters are allowed, subject to the same rules as for normal methods. Default values, however, can’t be specified for method parameters within a protocol’s definition.
+//
+//As with type property requirements, you always prefix type method requirements with the static keyword when they’re defined in a protocol. This is true even though type method requirements are prefixed with the class or static keyword when implemented by a class:
+
+protocol SomeProtocol2 {
+    static func someTypeMethod()
+}
+
+class TestClass: SomeProtocol2 {
+    //It's need have static... when we remove static it will show an error and ask to stub
+    static func someTypeMethod() {
+        
+    }
+}
+// type methods has the same way to use as type variables
+TestClass.someTypeMethod()
+
+//The following example defines a protocol with a single instance method requirement:
+
+protocol RandomNumberGenerator {
+    func random() -> Double
+}
+
+//Here’s an implementation of a class that adopts and conforms to the RandomNumberGenerator protocol. This class implements a pseudorandom number generator algorithm known as a linear congruential generator:
+
+class LinearCongruentialGenerator: RandomNumberGenerator {
+    var lastRandom = 42.0
+    let m = 139968.0
+    let a = 3877.0
+    let c = 29573.0
+    func random() -> Double {
+        lastRandom = ((lastRandom * a + c).truncatingRemainder(dividingBy:m))
+        return lastRandom / m
+    }
+}
+let generator = LinearCongruentialGenerator()
+print("Here's a random number: \(generator.random())")
+
+print("And another one: \(generator.random())")
+
+/*Mutating Method Requirements*/
+
+//It’s sometimes necessary for a method to modify (or mutate) the instance it belongs to. For instance methods on value types (that is, structures and enumerations) you place the mutating keyword before a method’s func keyword to indicate that the method is allowed to modify the instance it belongs to and any properties of that instance. This process is described in Modifying Value Types from Within Instance Methods.
+
+//
+//If you define a protocol instance method requirement that is intended to mutate instances of any type that adopts the protocol, mark the method with the mutating keyword as part of the protocol’s definition. This enables structures and enumerations to adopt the protocol and satisfy that method requirement.
+//
+//NOTE
+//
+//If you mark a protocol instance method requirement as mutating, you don’t need to write the mutating keyword when writing an implementation of that method for a class. The mutating keyword is only used by structures and enumerations.
+
+protocol Togglable {
+    mutating func toggle()
+}
+
+enum OnOffSwitch: Togglable {
+    case off, on
+    mutating func toggle() {
+        switch self {
+        case .off:
+            self = .on
+        case .on:
+            self = .off
+        }
+    }
+    // if you remove the mutating
+//    func toggle() {
+//        switch self {
+//        case .off:
+//            self = .on
+//        case .on:
+//            self = .off
+//        }
+//    }
+//
+//    Protocols.xcplaygroundpage:148:5: note: mark method 'mutating' to make 'self' mutable
+//    func toggle() {
+//        ^
+//        mutating
+    
+}
+var lightSwitch = OnOffSwitch.off
+lightSwitch.toggle()
+
+//Trying use mutating on classes:
+class MyOnOffSwitch: Togglable {
+    func toggle() {
+        print("toggle")
+    }
+}
+
+// Classes are reference type, that way you always you modify the instance not a copy.
+// This is way mutating is not required when we you implements the protocol method.
+
+/*Initializer Requirements*/
+
+//Protocols can require specific initializers to be implemented by conforming types. You write these initializers as part of the protocol’s definition in exactly the same way as for normal initializers, but without curly braces or an initializer body:
+
+protocol SomeProtocol3 {
+    init(someParameter: Int)
+}
+
+// Try open curly braces:
+
+//protocol SomeProtocol {
+//    init(someParameter: Int) {
+//        print(someParameter)
+//    }
+//}
+//Result:
+//error: Protocols.xcplaygroundpage:187:30: error: protocol initializers must not have bodies
+//init(someParameter: Int) {
+//                           ˆ
+
+// What happens if we try to extend it ?
+
+//extension SomeProtocol3 {
+//    init(someParameter: Int) {
+//        self.init(someParameter: someParameter)
+//        print(someParameter)
+//    }
+//}
+//It's very wrong!!! Because when you do somethig like that you enter in a loop. Init is calling init recursively
+// If you not insert self.init(someParameter: someParameter)
+//  error: Protocols.xcplaygroundpage:201:5: error: 'self.init' isn't called on all paths before returning from initializer
+//
+//
+//class TestProtocolInit: SomeProtocol3 {
+//
+//}
+//
+//let myTest = TestProtocolInit(someParameter: 10)
+
+/*Class Implementations of Protocol Initializer Requirements*/
+
+//You can implement a protocol initializer requirement on a conforming class as either a designated initializer or a convenience initializer. In both cases, you must mark the initializer implementation with the required modifier:
+
+class SomeClass: SomeProtocol {
+    required init(someParameter: Int) {
+        // initializer implementation goes here
+    }
+}
+
+//The use of the required modifier ensures that you provide an explicit or inherited implementation of the initializer requirement on all subclasses of the conforming class, such that they also conform to the protocol.
+//
+//For more information on required initializers, see Required Initializers.
+//
+//NOTE
+//
+//You don’t need to mark protocol initializer implementations with the required modifier on classes that are marked with the final modifier, because final classes can’t subclassed. For more about the final modifier, see Preventing Overrides.
