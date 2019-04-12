@@ -364,3 +364,95 @@ game.delegate = tracker
 game.play()
 
 /*Adding Protocol Conformance with an Extension*/
+
+//You can extend an existing type to adopt and conform to a new protocol, even if you don’t have access to the source code for the existing type. Extensions can add new properties, methods, and subscripts to an existing type, and are therefore able to add any requirements that a protocol may demand. For more about extensions, see Extensions.
+//
+//NOTE
+//
+//Existing instances of a type automatically adopt and conform to a protocol when that conformance is added to the instance’s type in an extension.
+//
+//For example, this protocol, called TextRepresentable, can be implemented by any type that has a way to be represented as text. This might be a description of itself, or a text version of its current state:
+
+protocol TextRepresentable {
+    var textualDescription: String { get }
+}
+
+//The Dice class from above can be extended to adopt and conform to TextRepresentable:
+
+extension Dice: TextRepresentable {
+    var textualDescription: String {
+        return "A \(sides)-sided dice"
+    }
+}
+
+//This extension adopts the new protocol in exactly the same way as if Dice had provided it in its original implementation. The protocol name is provided after the type name, separated by a colon, and an implementation of all requirements of the protocol is provided within the extension’s curly braces.
+
+let d12 = Dice(sides: 12, generator: LinearCongruentialGenerator())
+print(d12.textualDescription)
+
+extension SnakesAndLadders: TextRepresentable {
+    var textualDescription: String {
+        return "A game of Snakes and Ladders with \(finalSquare) squares"
+    }
+}
+print(game.textualDescription)
+
+/*Conditionally Conforming to a Protocol*/
+
+//A generic type may be able to satisfy the requirements of a protocol only under certain conditions, such as when the type’s generic parameter conforms to the protocol. You can make a generic type conditionally conform to a protocol by listing constraints when extending the type. Write these constraints after the name of the protocol you’re adopting by writing a generic where clause. For more about generic where clauses, see Generic Where Clauses.
+
+
+//The following extension makes Array instances conform to the TextRepresentable protocol whenever they store elements of a type that conforms to TextRepresentable.
+
+extension Array: TextRepresentable where Element: TextRepresentable {
+    var textualDescription: String {
+        let itemsAsText = self.map { $0.textualDescription }
+        return "[" + itemsAsText.joined(separator: ", ") + "]"
+    }
+}
+let myDice = [d6, d12]
+print(myDice.textualDescription)
+
+//Proof:
+
+//class MyElement {
+//
+//}
+//
+//let myArray = [MyElement(), MyElement()]
+//print(myArray.textualDescription)
+//Property 'textualDescription' requires that 'MyElement' conform to 'TextRepresentable'
+
+/*Declaring Protocol Adoption with an Extension*/
+
+//If a type already conforms to all of the requirements of a protocol, but has not yet stated that it adopts that protocol, you can make it adopt the protocol with an empty extension:
+
+struct Hamster {
+    var name: String
+    var textualDescription: String {
+        return "A hamster named \(name)"
+    }
+}
+extension Hamster: TextRepresentable {}
+
+//Instances of Hamster can now be used wherever TextRepresentable is the required type:
+
+let simonTheHamster = Hamster(name: "Simon")
+let somethingTextRepresentable: TextRepresentable = simonTheHamster
+print(somethingTextRepresentable.textualDescription)
+
+//NOTE
+//
+//Types don’t automatically adopt a protocol just by satisfying its requirements. They must always explicitly declare their adoption of the protocol.
+
+/*Collections of Protocol Types*/
+
+//A protocol can be used as the type to be stored in a collection such as an array or a dictionary, as mentioned in Protocols as Types. This example creates an array of TextRepresentable things:
+
+let things: [TextRepresentable] = [game, d12, simonTheHamster]
+
+for thing in things {
+    print(thing.textualDescription)
+}
+
+/*Protocol Inheritance*/
