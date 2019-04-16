@@ -506,9 +506,9 @@ class TestClassOnlyProtocol: SomeClassOnlyProtocol {
 }
 // It works...
 
-struct TestStructClassOnlyProtocol: SomeClassOnlyProtocol {
-    
-}
+//struct TestStructClassOnlyProtocol: SomeClassOnlyProtocol {
+//    
+//}
 
 // It not works...
 //error: non-class type 'TestStructClassOnlyProtocol' cannot conform to class protocol 'SomeClassOnlyProtocol'
