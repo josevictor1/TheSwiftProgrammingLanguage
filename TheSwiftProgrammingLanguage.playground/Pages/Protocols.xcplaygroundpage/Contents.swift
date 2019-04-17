@@ -602,10 +602,54 @@ beginConcert(in: seattle)
 class NotConformWithNamed: Location {
     
 }
-let notConformWithNamed = NotConformWithNamed()
+//let notConformWithNamed = NotConformWithNamed()
 //beginConcert(in: NotConformWithNamed)
 //error: argument type 'NotConformWithNamed.Type' does not conform to expected type 'Location & Named'
 //beginConcert(in: NotConformWithNamed)
 //^~~~~~~~~~~~~~~~~~~
 
 /*Checking for Protocol Conformance*/
+//You can use the is and as operators described in Type Casting to check for protocol conformance, and to cast to a specific protocol. Checking for and casting to a protocol follows exactly the same syntax as checking for and casting to a type:
+//
+//The is operator returns true if an instance conforms to a protocol and returns false if it doesn’t.
+//The as? version of the downcast operator returns an optional value of the protocol’s type, and this value is nil if the instance doesn’t conform to that protocol.
+//The as! version of the downcast operator forces the downcast to the protocol type and triggers a runtime error if the downcast doesn’t succeed.
+
+protocol HasArea {
+    var area: Double { get }
+}
+
+
+class Circle: HasArea {
+    let pi = 3.1415927
+    var radius: Double
+    var area: Double { return pi * radius * radius }
+    init(radius: Double) { self.radius = radius }
+}
+class Country: HasArea {
+    var area: Double
+    init(area: Double) { self.area = area }
+}
+
+class Animal {
+    var legs: Int
+    init(legs: Int) { self.legs = legs }
+}
+
+let objects: [AnyObject] = [
+    Circle(radius: 2.0),
+    Country(area: 243_610),
+    Animal(legs: 4)
+]
+
+for object in objects {
+    if let objectWithArea = object as? HasArea {
+        print("Area is \(objectWithArea.area)")
+    } else {
+        print("Something that doesn't have an area")
+    }
+}
+
+//Whenever an object in the array conforms to the HasArea protocol, the optional value returned by the as? operator is unwrapped with optional binding into a constant called objectWithArea. The objectWithArea constant is known to be of type HasArea, and so its area property can be accessed and printed in a type-safe way.
+
+//Note that the underlying objects aren’t changed by the casting process. They continue to be a Circle, a Country and an Animal. However, at the point that they’re stored in the objectWithArea constant, they’re only known to be of type HasArea, and so only their area property can be accessed.
