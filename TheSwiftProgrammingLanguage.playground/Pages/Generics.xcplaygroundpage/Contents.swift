@@ -26,14 +26,14 @@ print("someInt is now \(someInt), and anotherInt is now \(anotherInt)")
 
 //
 
-func swapTwoStrings(_ a: inout String, _b: inout) {
+func swapTwoStrings(_ a: inout String, _ b: inout String) {
     let temporaryA = a
     a = b
     b = temporaryA
 }
 
-func swapTwoDoubles(_ a: inout Double, _ b: inout) {
-    let temporary = a
+func swapTwoDoubles(_ a: inout Double, _ b: inout Double) {
+    let temporaryA = a
     a = b
     b = temporaryA
 }
@@ -44,4 +44,20 @@ func swapTwoDoubles(_ a: inout Double, _ b: inout) {
 
 //NOTE
 
-//In all three functions, the types of a and b must be the same. If a and b aren't of the same type, it isn't possible to swap
+//In all three functions, the types of a and b must be the same. If a and b aren't of the same type, it isn't possible to swap their values.  Swift is a type-safe language, and doesn’t allow (for example) a variable of type String and a variable of type Double to swap values with each other. Attempting to do so results in a compile-time error.s
+
+//Generic Functions
+
+//Generic functions can work with any type. Here’s a generic version of the swapTwoInts(_:_:) function from above, called swapTwoValues(_:_:):
+
+func swapTwoValues<T>(_ a: inout T, _ b: inout T) {
+    let temporaryA = a
+    a = b
+    b = temporaryA
+}
+
+
+//The body of the swapTwoValues(_:_:) function is identical to the body of the swapTwoInts(_:_:) function. However, the first line of swapTwoValues(_:_:) is slightly different from swapTwoInts(_:_:). Here’s how the first lines compare:
+//
+//func swapTwoInts(_ a: inout Int, _ b: inout Int)
+//func swapTwoValues<T>(_ a: inout T, _ b: inout T)
