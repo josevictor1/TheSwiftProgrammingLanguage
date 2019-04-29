@@ -176,3 +176,53 @@ let fromTheTop = stackOfStrings.pop()
 showImage(with: "https://docs.swift.org/swift-book/_images/stackPoppedOneString_2x.png")
 
 /*Extending a Generic Type*/
+
+//When you extend a generic type, you don’t provide a type parameter list as part of the extension’s definition. Instead, the type parameter list from the original type definition is available within the body of the extension, and the original type parameter names are used to refer to the type parameters from the original definition.
+//
+//The following example extends the generic Stack type to add a read-only computed property called topItem, which returns the top item on the stack without popping it from the stack:
+
+extension Stack {
+    var topItem: Element? {
+        return items.isEmpty ? nil : items[items.count - 1]
+    }
+}
+
+//Can we do this ?
+//
+//struct MyStack: Stack {
+//
+//}
+//Nope!
+// Why ?
+// reference to generic type 'Stack' requires arguments in <...>
+//struct MyStack: Stack {
+//    ^
+//    <Any>
+// https://stackoverflow.com/questions/31465100/subclassing-generic-structs
+//It's my understanding that inheritance is the defining difference between classes and non-class objects like structs and enums in swift. Classes have inheritance, other objects types do not.
+
+//Thus I think the answer is "No, not now, and not ever, by design."
+//
+// Proof: The problem it's not the generic term
+//struct A {
+//
+//}
+//
+//struct B: A {
+//
+//}
+
+//error: Generics.xcplaygroundpage:211:8: error: inheritance from non-protocol type 'A'
+//struct B: A {
+//^
+
+//Note that this extension doesn’t define a type parameter list. Instead, the Stack type’s existing type parameter name, Element, is used within the extension to indicate the optional type of the topItem computed property.
+
+//The topItem computed property can now be used with any Stack instance to access and query its top item without removing it.
+
+if let topItem = stackOfStrings.topItem {
+    print("The top item on the stack is \(topItem).")
+}
+// Prints "The top item on the stack is tres."
+
+/*Type Constraints*/
