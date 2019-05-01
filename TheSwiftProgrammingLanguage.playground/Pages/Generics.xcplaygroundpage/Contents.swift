@@ -226,3 +226,122 @@ if let topItem = stackOfStrings.topItem {
 // Prints "The top item on the stack is tres."
 
 /*Type Constraints*/
+
+//The swapTwoValues(_:_:) function and the Stack type can work with any type. However, it’s sometimes useful to enforce certain type constraints on the types that can be used with generic functions and generic types. Type constraints specify that a type parameter must inherit from a specific class, or conform to a particular protocol or protocol composition.
+//
+//For example, Swift’s Dictionary type places a limitation on the types that can be used as keys for a dictionary. As described in Dictionaries, the type of a dictionary’s keys must be hashable. That is, it must provide a way to make itself uniquely representable. Dictionary needs its keys to be hashable so that it can check whether it already contains a value for a particular key. Without this requirement, Dictionary could not tell whether it should insert or replace a value for a particular key, nor would it be able to find a value for a given key that is already in the dictionary.
+//
+//This requirement is enforced by a type constraint on the key type for Dictionary, which specifies that the key type must conform to the Hashable protocol, a special protocol defined in the Swift standard library. All of Swift’s basic types (such as String, Int, Double, and Bool) are hashable by default.
+//
+//You can define your own type constraints when creating custom generic types, and these constraints provide much of the power of generic programming. Abstract concepts like Hashable characterize types in terms of their conceptual characteristics, rather than their concrete type.
+
+/*Type Constraint Syntax*/
+
+//You write type constraints by placing a single class or protocol constraint after a type parameter’s name, separated by a colon, as part of the type parameter list. The basic syntax for type constraints on a generic function is shown below (although the syntax is the same for generic types):
+
+
+//func someFunction<T: SomeClass, U: SomeProtocol>(someT: T, someU: U) {
+//    // function body goes here
+//}
+
+/*Type Constraints in Action*/
+
+//Here’s a nongeneric function called findIndex(ofString:in:), which is given a String value to find and an array of String values within which to find it. The findIndex(ofString:in:) function returns an optional Int value, which will be the index of the first matching string in the array if it’s found, or nil if the string can’t be found:
+
+func findIndex(ofString valueToFind: String, in array: [String]) -> Int? {
+    for (index, value) in array.enumerated() {
+        if value == valueToFind {
+            return index
+        }
+    }
+    return nil
+}
+
+let strings = ["cat", "dog", "llama", "parakeet", "terrapin"]
+if let foundIndex = findIndex(ofString: "llama", in: strings) {
+    print("The index of llama is \(foundIndex)")
+}
+
+//func findIndex<T>(of valueToFind: T, in array:[T]) -> Int? {
+//    for (index, value) in array.enumerated() {
+//        if value == valueToFind {
+//            return index
+//        }
+//    }
+//    return nil
+//}
+
+//This function doesn’t compile as written above. The problem lies with the equality check, “if value == valueToFind”. Not every type in Swift can be compared with the equal to operator (==). If you create your own class or structure to represent a complex data model, for example, then the meaning of “equal to” for that class or structure isn’t something that Swift can guess for you. Because of this, it isn’t possible to guarantee that this code will work for every possible type T, and an appropriate error is reported when you try to compile the code.
+//
+//All is not lost, however. The Swift standard library defines a protocol called Equatable, which requires any conforming type to implement the equal to operator (==) and the not equal to operator (!=) to compare any two values of that type. All of Swift’s standard types automatically support the Equatable protocol.
+//
+//Any type that is Equatable can be used safely with the findIndex(of:in:) function, because it’s guaranteed to support the equal to operator. To express this fact, you write a type constraint of Equatable as part of the type parameter’s definition when you define the function:
+
+func findIndex<T: Equatable>(of valueToFind: T, in array:[T]) -> Int? {
+    for (index, value) in array.enumerated() {
+        if value == valueToFind {
+            return index
+        }
+    }
+    return nil
+}
+
+//The single type parameter for findIndex(of:in:) is written as T: Equatable, which means “any type T that conforms to the Equatable protocol.”
+
+let doubleIndex = findIndex(of: 9.3, in: [3.14159, 0.1, 0.25])
+// doubleIndex is an optional Int with no value, because 9.3 isn't in the array
+let stringIndex = findIndex(of: "Andrea", in: ["Mike", "Malcolm", "Andrea"])
+// stringIndex is an optional Int containing a value of 2
+
+/*Associated Types*/
+//When defining a protocol, it’s sometimes useful to declare one or more associated types as part of the protocol’s definition. An associated type gives a placeholder name to a type that is used as part of the protocol. The actual type to use for that associated type isn’t specified until the protocol is adopted. Associated types are specified with the associatedtype keyword.
+
+/*Associated Types in Action*/
+
+//When defining a protocol, it’s sometimes useful to declare one or more associated types as part of the protocol’s definition. An associated type gives a placeholder name to a type that is used as part of the protocol. The actual type to use for that associated type isn’t specified until the protocol is adopted. Associated types are specified with the associatedtype keyword.
+//
+//Associated Types in Action
+//Here’s an example of a protocol called Container, which declares an associated type called Item:
+
+protocol Container {
+    associatedtype Item
+    mutating func append(_ item: Item)
+    var count: Int { get }
+    subscript(i: Int) -> Item { get }
+}
+//The Container protocol defines three required capabilities that any container must provide:
+//
+//It must be possible to add a new item to the container with an append(_:) method.
+//It must be possible to access a count of the items in the container through a count property that returns an Int value.
+//It must be possible to retrieve each item in the container with a subscript that takes an Int index value.
+//This protocol doesn’t specify how the items in the container should be stored or what type they’re allowed to be. The protocol only specifies the three bits of functionality that any type must provide in order to be considered a Container. A conforming type can provide additional functionality, as long as it satisfies these three requirements.
+//
+//Any type that conforms to the Container protocol must be able to specify the type of values it stores. Specifically, it must ensure that only items of the right type are added to the container, and it must be clear about the type of the items returned by its subscript.
+//
+//To define these requirements, the Container protocol needs a way to refer to the type of the elements that a container will hold, without knowing what that type is for a specific container. The Container protocol needs to specify that any value passed to the append(_:) method must have the same type as the container’s element type, and that the value returned by the container’s subscript will be of the same type as the container’s element type.
+//
+//To achieve this, the Container protocol declares an associated type called Item, written as associatedtype Item. The protocol doesn’t define what Item is—that information is left for any conforming type to provide. Nonetheless, the Item alias provides a way to refer to the type of the items in a Container, and to define a type for use with the append(_:) method and subscript, to ensure that the expected behavior of any Container is enforced.
+
+//Here’s a version of the nongeneric IntStack type from Generic Types above, adapted to conform to the Container protocol:
+
+struct IntStack1: Container {
+    // original IntStack implementation
+    var items = [Int]()
+    mutating func push(_ item: Int) {
+        items.append(item)
+    }
+    mutating func pop() -> Int {
+        return items.removeLast()
+    }
+    // conformance to the Container protocol
+    typealias Item = Int
+    mutating func append(_ item: Int) {
+        self.push(item)
+    }
+    var count: Int {
+        return items.count
+    }
+    subscript(i: Int) -> Int {
+        return items[i]
+    }
+}

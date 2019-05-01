@@ -4,5 +4,7 @@
         <page name='Properties'/>
         <page name='Protocols'/>
         <page name='Initializers'/>
+        <page name='Generics'/>
+        <page name='Subscripts'/>
     </pages>
 </playground>
