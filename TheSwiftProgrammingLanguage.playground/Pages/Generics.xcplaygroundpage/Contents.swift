@@ -334,6 +334,10 @@ struct IntStack1: Container {
         return items.removeLast()
     }
     // conformance to the Container protocol
+    // In this case typealias is used to speccify the type of Item. This is required. Proof: When we comment the typealias line we have:
+    //    Generics.xcplaygroundpage:307:20: note: protocol requires nested type 'Item'; do you want to add it?
+    //    associatedtype Item
+    //    ^
     typealias Item = Int
     mutating func append(_ item: Int) {
         self.push(item)
