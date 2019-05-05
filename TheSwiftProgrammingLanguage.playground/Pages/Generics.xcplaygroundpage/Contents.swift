@@ -339,6 +339,7 @@ struct IntStack1: Container {
     //    associatedtype Item
     //    ^
     typealias Item = Int
+    
     mutating func append(_ item: Int) {
         self.push(item)
     }
@@ -349,3 +350,118 @@ struct IntStack1: Container {
         return items[i]
     }
 }
+
+//The IntStack type implements all three of the Container protocol’s requirements, and in each case wraps part of the IntStack type’s existing functionality to satisfy these requirements.
+//
+//Moreover, IntStack specifies that for this implementation of Container, the appropriate Item to use is a type of Int. The definition of typealias Item = Int turns the abstract type of Item into a concrete type of Int for this implementation of the Container protocol.
+//
+//Thanks to Swift’s type inference, you don’t actually need to declare a concrete Item of Int as part of the definition of IntStack. Because IntStack conforms to all of the requirements of the Container protocol, Swift can infer the appropriate Item to use, simply by looking at the type of the append(_:) method’s item parameter and the return type of the subscript. Indeed, if you delete the typealias Item = Int line from the code above, everything still works, because it’s clear what type should be used for Item.
+//
+//You can also make the generic Stack type conform to the Container protocol:
+
+struct Stack1<Element>: Container {
+    // original Stack<Element> implementation
+    var items = [Element]()
+    mutating func push(_ item: Element) {
+        items.append(item)
+    }
+    mutating func pop() -> Element {
+        return items.removeLast()
+    }
+    // conformance to the Container protocol
+    mutating func append(_ item: Element) {
+        self.push(item)
+    }
+    var count: Int {
+        return items.count
+    }
+    subscript(i: Int) -> Element {
+        return items[i]
+    }
+}
+
+//This time, the type parameter Element is used as the type of the append(_:) method’s item parameter and the return type of the subscript. Swift can therefore infer that Element is the appropriate type to use as the Item for this particular container.
+
+/*Extending an Existing Type to Specify an Associated Type*/
+
+//You can extend an existing type to add conformance to a protocol, as described in Adding Protocol Conformance with an Extension. This includes a protocol with an associated type.
+
+//Swift’s Array type already provides an append(_:) method, a count property, and a subscript with an Int index to retrieve its elements. These three capabilities match the requirements of the Container protocol. This means that you can extend Array to conform to the Container protocol simply by declaring that Array adopts the protocol. You do this with an empty extension, as described in Declaring Protocol Adoption with an Extension:
+
+extension Array: Container {}
+
+//Array’s existing append(_:) method and subscript enable Swift to infer the appropriate type to use for Item, just as for the generic Stack type above. After defining this extension, you can use any Array as a Container.
+
+
+/*Adding Constraints to an Associated Type*/
+
+//You can add type constraints to an associated type in a protocol to require that conforming types satisfy those constraints. For example, the following code defines a version of Container that requires the items in the container to be equatable.
+
+protocol Container1 {
+    associatedtype Item: Equatable
+    mutating func append(_ item: Item)
+    var count: Int { get }
+    subscript(i: Int) -> Item { get }
+}
+
+//To conform to this version of Container, the container’s Item type has to conform to the Equatable protocol.
+//Proof:
+
+struct Point: Equatable {
+    let x: Int
+    let y: Int
+}
+
+
+struct MyStruct<Item: Equatable>: Container1 {
+    var items = [Item]()
+    func append(_ item: Item) {
+        
+    }
+    
+    var count: Int {
+        return items.count
+    }
+    
+    
+    subscript(i: Int) -> Item {
+        return items[i]
+    }
+}
+
+// If the type is not equatable:
+//Generics.xcplaygroundpage:401:20: note: unable to infer associated type 'Item' for protocol 'Container1'
+//associatedtype Item: Equatable
+
+// When you make Item being Equatable you need to specify this in < ...: Equatable>. Making this you are like: "Oh man... I want my generic element being Equatable!"
+
+
+/*Using a Protocol in Its Associated Type’s Constraints*/
+
+//A protocol can appear as part of its own requirements. For example, here’s a protocol that refines the Container protocol, adding the requirement of a suffix(_:) method. The suffix(_:) method returns a given number of elements from the end of the container, storing them in an instance of the Suffix type.
+
+protocol SuffixableContainer: Container {
+    associatedtype Suffix: SuffixableContainer where Suffix.Item == Item
+    func suffix(_ size: Int) -> Suffix
+}
+
+//In this protocol, Suffix is an associated type, like the Item type in the Container example above. Suffix has two constraints: It must conform to the SuffixableContainer protocol (the protocol currently being defined), and its Item type must be the same as the container’s Item type. The constraint on Item is a generic where clause, which is discussed in Associated Types with a Generic Where Clause below.
+//
+//Here’s an extension of the Stack type from Strong Reference Cycles for Closures above that adds conformance to the SuffixableContainer protocol:
+
+extension Stack1: SuffixableContainer {
+    func suffix(_ size: Int) -> Stack1 {
+        var result = Stack1()
+        for index in (count-size)..<count {
+            result.append(self[index])
+        }
+        return result
+    }
+    // Inferred that Suffix is Stack.
+}
+var stackOfInts = Stack1<Int>()
+stackOfInts.append(10)
+stackOfInts.append(20)
+stackOfInts.append(30)
+let suffix = stackOfInts.suffix(2)
+
