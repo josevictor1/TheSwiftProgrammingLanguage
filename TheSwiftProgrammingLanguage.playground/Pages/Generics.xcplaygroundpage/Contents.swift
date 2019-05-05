@@ -465,3 +465,4 @@ stackOfInts.append(20)
 stackOfInts.append(30)
 let suffix = stackOfInts.suffix(2)
 
+/*Generic Where Clauses*/
