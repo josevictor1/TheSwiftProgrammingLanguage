@@ -362,6 +362,7 @@ struct IntStack1: Container {
 struct Stack1<Element>: Container {
     // original Stack<Element> implementation
     var items = [Element]()
+    
     mutating func push(_ item: Element) {
         items.append(item)
     }
@@ -466,3 +467,64 @@ stackOfInts.append(30)
 let suffix = stackOfInts.suffix(2)
 
 /*Generic Where Clauses*/
+
+//
+//Type constraints, as described in Type Constraints, enable you to define requirements on the type parameters associated with a generic function, subscript, or type.
+//
+//It can also be useful to define requirements for associated types. You do this by defining a generic where clause. A generic where clause enables you to require that an associated type must conform to a certain protocol, or that certain type parameters and associated types must be the same. A generic where clause starts with the where keyword, followed by constraints for associated types or equality relationships between types and associated types. You write a generic where clause right before the opening curly brace of a type or function’s body.
+//
+//The example below defines a generic function called allItemsMatch, which checks to see if two Container instances contain the same items in the same order. The function returns a Boolean value of true if all items match and a value of false if they don’t.
+//
+//The two containers to be checked don’t have to be the same type of container (although they can be), but they do have to hold the same type of items. This requirement is expressed through a combination of type constraints and a generic where clause:
+
+func allItemsMatch<C1: Container, C2: Container>
+    (_ someContainer: C1, _ anotherContainer: C2) -> Bool
+    where C1.Item == C2.Item, C1.Item: Equatable {
+        
+        // Check that both containers contain the same number of items.
+        if someContainer.count != anotherContainer.count {
+            return false
+        }
+        
+        // Check each pair of items to see if they're equivalent.
+        for i in 0..<someContainer.count {
+            if someContainer[i] != anotherContainer[i] {
+                return false
+            }
+        }
+        
+        // All items match, so return true.
+        return true
+}
+
+
+let stackOfInts1 = IntStack1(items: [1, 2, 3, 4, 5])
+let stackOfInts2 = IntStack1(items: [1, 2, 3, 4, 6])
+
+allItemsMatch(stackOfInts1 , stackOfInts2)
+
+
+var stackOfStrings1 = Stack1<String>()
+stackOfStrings1.push("uno")
+stackOfStrings1.push("dos")
+stackOfStrings1.push("tres")
+
+var arrayOfStrings = ["uno", "dos", "tres"]
+
+if allItemsMatch(stackOfStrings1, arrayOfStrings) {
+    print("All items match.")
+} else {
+    print("Not all items match.")
+}
+
+// Proof:
+// This work ?
+//if allItemsMatch(stackOfInts1, arrayOfStrings) {
+//    print("Comparing string with numbers")
+//}
+//No
+//Generics.xcplaygroundpage:480:6: note: candidate requires that the types 'IntStack1.Item' (aka 'Int') and 'String' be equivalent (requirement specified as 'C1.Item' == 'C2.Item' [with C1 = IntStack1, C2 = [String]])
+//func allItemsMatch<C1: Container, C2: Container>
+//^
+
+/*Extensions with a Generic Where Clause*/
