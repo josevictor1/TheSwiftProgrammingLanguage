@@ -528,3 +528,141 @@ if allItemsMatch(stackOfStrings1, arrayOfStrings) {
 //^
 
 /*Extensions with a Generic Where Clause*/
+
+//You can also use a generic where clause as part of an extension. The example below extends the generic Stack structure from the previous examples to add an isTop(_:) method.
+
+extension Stack where Element: Equatable {
+    func isTop(_ item: Element) -> Bool {
+        guard let topItem = items.last else {
+            return false
+        }
+        return topItem == item
+    }
+}
+
+//This new isTop(_:) method first checks that the stack isn’t empty, and then compares the given item against the stack’s topmost item. If you tried to do this without a generic where clause, you would have a problem: The implementation of isTop(_:) uses the == operator, but the definition of Stack doesn’t require its items to be equatable, so using the == operator results in a compile-time error. Using a generic where clause lets you add a new requirement to the extension, so that the extension adds the isTop(_:) method only when the items in the stack are equatable.
+
+if stackOfStrings.isTop("tres") {
+    print("Top element is tres")
+} else {
+    print("Top element is something else ")
+}
+
+// Proof:
+// It works!
+if stackOfInt.isTop(1) {
+    print("\(stackOfInts[1]) is the top element")
+} else {
+    print("Top element is something else")
+}
+
+//If we try something different
+//struct Point1 {
+//    let x: Int
+//    let y: Int
+//}
+//
+//var stackOfPoints = Stack<Point1>()
+//stackOfPoints.push(Point1(x: 1, y: 0))
+//stackOfPoints.push(Point1(x: 1, y: 1))
+//stackOfPoints.push(Point1(x: 1, y: 2))
+//stackOfPoints.push(Point1(x: 1, y: 3))
+//
+//if stackOfPoints.isTop(Point1(x: 1, y: 0)) {
+//    print("Top element is  x: \(1) y:\(0)")
+//} else {
+//    print("Top element is something else")
+//}
+//
+//Argument type 'Point1' does not conform to expected type 'Equatable'
+
+struct NotEquatable { }
+var notEquatableStack = Stack<NotEquatable>()
+let notEquatableValue = NotEquatable()
+notEquatableStack.push(notEquatableValue)
+//notEquatableStack.isTop(notEquatableValue)  // Error
+
+//You can use a generic where clause with extensions to a protocol. The example below extends the Container protocol from the previous examples to add a startsWith(_:) method.
+
+extension Container where Item: Equatable {
+    func startsWith(_ item: Item) -> Bool {
+        return count >= 1 && self[0] == item
+    }
+}
+
+//The startsWith(_:) method first makes sure that the container has at least one item, and then it checks whether the first item in the container matches the given item. This new startsWith(_:) method can be used with any type that conforms to the Container protocol, including the stacks and arrays used above, as long as the container’s items are equatable.
+
+if [9, 9, 9].startsWith(42) {
+    print("Starts with 42.")
+} else {
+    print("Starts with something else.")
+}
+
+//The generic where clause in the example above requires Item to conform to a protocol, but you can also write a generic where clauses that require Item to be a specific type. For example:
+
+extension Container where Item == Double {
+    func average() -> Double {
+        var sum = 0.0
+        for index in 0..<count {
+            sum += self[index]
+        }
+        return sum / Double(count)
+    }
+}
+
+// You can do that too.
+extension Container where Item == Float {
+    func average() -> Float {
+        var sum: Float = 0.0
+        for index in 0..<count {
+            sum += self[index]
+        }
+        return sum / Float(count)
+    }
+}
+
+print([1260.0, 1200.0, 98.6, 37.0].average())
+
+//This example adds an average() method to containers whose Item type is Double. It iterates over the items in the container to add them up, and divides by the container’s count to compute the average. It explicitly converts the count from Int to Double to be able to do floating-point division.
+//
+//You can include multiple requirements in a generic where clause that is part of an extension, just like you can for a generic where clause that you write elsewhere. Separate each requirement in the list with a comma.
+
+/*Associated Types with a Generic Where Clause*/
+
+protocol Container2 {
+    associatedtype Item
+    mutating func append(_ item: Item)
+    var count: Int { get }
+    subscript(i: Int) -> Item { get }
+    
+    associatedtype Iterator: IteratorProtocol where Iterator.Element == Item
+    func makeIterator() -> Iterator
+}
+
+//The generic where clause on Iterator requires that the iterator must traverse over elements of the same item type as the container’s items, regardless of the iterator’s type. The makeIterator() function provides access to a container’s iterator.
+//
+//For a protocol that inherits from another protocol, you add a constraint to an inherited associated type by including the generic where clause in the protocol declaration. For example, the following code declares a ComparableContainer protocol that requires Item to conform to Comparable:
+
+protocol ComparableContainer: Container2 where Item: Comparable { }
+
+/*Generic Subscripts*/
+
+//Subscripts can be generic, and they can include generic where clauses. You write the placeholder type name inside angle brackets after subscript, and you write a generic where clause right before the opening curly brace of the subscript’s body. For example:
+
+extension Container2 {
+    subscript<Indices: Sequence>(indices: Indices) -> [Item]
+        where Indices.Iterator.Element == Int {
+            var result = [Item]()
+            for index in indices {
+                result.append(self[index])
+            }
+            return result
+    }
+}
+
+//This extension to the Container protocol adds a subscript that takes a sequence of indices and returns an array containing the items at each given index. This generic subscript is constrained as follows:
+//
+//The generic parameter Indices in angle brackets has to be a type that conforms to the Sequence protocol from the standard library.
+//The subscript takes a single parameter, indices, which is an instance of that Indices type.
+//The generic where clause requires that the iterator for the sequence must traverse over elements of type Int. This ensures that the indices in the sequence are the same type as the indices used for a container.
+//Taken together, these constraints mean that the value passed for the indices parameter is a sequence of integers.
