@@ -70,3 +70,4 @@ numberOfLegs["bird"] = 2
 
 //Subscripts can take any number of input parameters, and these input parameters can be of any type. Subscripts can also return any type. Subscripts can use variadic parameters, but they can’t use in-out parameters or provide default parameter values.
 
+s
