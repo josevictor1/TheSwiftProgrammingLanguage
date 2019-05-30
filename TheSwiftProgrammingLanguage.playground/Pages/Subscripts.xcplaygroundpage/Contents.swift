@@ -70,4 +70,50 @@ numberOfLegs["bird"] = 2
 
 //Subscripts can take any number of input parameters, and these input parameters can be of any type. Subscripts can also return any type. Subscripts can use variadic parameters, but they can’t use in-out parameters or provide default parameter values.
 
-s
+// A class or structure can provide as many subscript implementations as it needs, and the appropriate subscript to be used will be inferred based on the types of the value or values that are contained within the subscript brackets at the point that the subscript is used. This definition of multiple subscripts is known as subscript overloading.
+
+//While it is most common for a subscript to take a single parameter, you can also define a subscript with multiple parameters if it is appropriate for your type. The following example defines a Matrix structure, which represents a two-dimensional matrix of Double values. The Matrix structure’s subscript takes two integer parameters:
+
+
+struct Matrix {
+    //We can do that? Amazing!
+    let rows: Int, columns: Int
+    
+    var grid: [Double]
+    init(rows: Int, columns: Int) {
+        self.rows = rows
+        self.columns = columns
+        grid = Array(repeating: 0.0, count: rows * columns)
+    }
+    func indexIsValid(row: Int, column: Int) -> Bool {
+        return row >= 0 && row < rows && column >= 0 && column < columns
+    }
+    subscript(row: Int, column: Int) -> Double {
+        get {
+            assert(indexIsValid(row: row, column: column), "Index out of range")
+            return grid[(row * columns) + column]
+        }
+        set {
+            assert(indexIsValid(row: row, column: column), "Index out of range")
+            grid[(row * columns) + column] = newValue
+        }
+    }
+}
+
+//Matrix provides an initializer that takes two parameters called rows and columns, and creates an array that is large enough to store rows * columns values of type Double. Each position in the matrix is given an initial value of 0.0. To achieve this, the array’s size, and an initial cell value of 0.0, are passed to an array initializer that creates and initializes a new array of the correct size. This initializer is described in more detail in Creating an Array with a Default Value.
+//
+//You can construct a new Matrix instance by passing an appropriate row and column count to its initializer:
+//
+
+var matrix = Matrix(rows: 2, columns: 2)
+
+//The grid array for this Matrix instance is effectively a flattened version of the matrix, as read from top left to bottom right.
+
+//Values in the matrix can be set by passing row and column values into the subscript, separated by a comma:
+
+matrix[0, 1] = 1.5
+matrix[1, 0] = 3.2
+
+//An assertion is triggered if you try to access a subscript that is outside of the matrix bounds:
+
+let someValue = matrix[2, 2]
