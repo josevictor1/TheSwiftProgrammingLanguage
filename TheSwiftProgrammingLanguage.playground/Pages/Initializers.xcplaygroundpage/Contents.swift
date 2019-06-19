@@ -49,19 +49,19 @@ print("The default temperature is \(f.temperature)° Fahrenheit")
 //
 //The following example defines a structure called Celsius, which stores temperatures expressed in degrees Celsius. The Celsius structure implements two custom initializers called init(fromFahrenheit:) and init(fromKelvin:), which initialize a new instance of the structure with a value from a different temperature scale:
 
-struct Celsius {
-    var temperatureInCelsius: Double
-    init(fromFahrenheit fahrenheit: Double) {
-        temperatureInCelsius = (fahrenheit - 32.0) / 1.8
-    }
-    init(fromKelvin kelvin: Double) {
-        temperatureInCelsius = kelvin - 273.15
-    }
-}
-let boilingPointOfWater = Celsius(fromFahrenheit: 212.0)
-// boilingPointOfWater.temperatureInCelsius is 100.0
-let freezingPointOfWater = Celsius(fromKelvin: 273.15)
-// freezingPointOfWater.temperatureInCelsius is 0.0
+//struct Celsius {
+//    var temperatureInCelsius: Double
+//    init(fromFahrenheit fahrenheit: Double) {
+//        temperatureInCelsius = (fahrenheit - 32.0) / 1.8
+//    }
+//    init(fromKelvin kelvin: Double) {
+//        temperatureInCelsius = kelvin - 273.15
+//    }
+//}
+//let boilingPointOfWater = Celsius(fromFahrenheit: 212.0)
+//// boilingPointOfWater.temperatureInCelsius is 100.0
+//let freezingPointOfWater = Celsius(fromKelvin: 273.15)
+//// freezingPointOfWater.temperatureInCelsius is 0.0
 
 //The first initializer has a single initialization parameter with an argument label of fromFahrenheit and a parameter name of fahrenheit. The second initializer has a single initialization parameter with an argument label of fromKelvin and a parameter name of kelvin. Both initializers convert their single argument into the corresponding Celsius value and store this value in a property called temperatureInCelsius.
 
@@ -102,3 +102,70 @@ let halfGray = Color(white: 0.5)
 
 //If you do not want to use an argument label for an initializer parameter, write an underscore (_) instead of an explicit argument label for that parameter to override the default behavior.
 
+//Here’s an expanded version of the Celsius example from Initialization Parameters above, with an additional initializer to create a new Celsius instance from a Double value that is already in the Celsius scale:
+
+
+struct Celsius {
+    var temperatureInCelsius: Double
+    init(fromFahrenheit fahrenheit: Double) {
+        temperatureInCelsius = (fahrenheit - 32.0) / 1.8
+    }
+    init(fromKelvin kelvin: Double) {
+        temperatureInCelsius = kelvin - 273.15
+    }
+    init(_ celsius: Double) {
+        temperatureInCelsius = celsius
+    }
+}
+let bodyTemperature = Celsius(37.0)
+// bodyTemperature.temperatureInCelsius is 37.0
+
+//The initializer call Celsius(37.0) is clear in its intent without the need for an argument label. It is therefore appropriate to write this initializer as init(_ celsius: Double) so that it can be called by providing an unnamed Double value.
+
+//Optional Property Types
+
+//If your custom type has a stored property that is logically allowed to have “no value”—perhaps because its value cannot be set during initialization, or because it is allowed to have “no value” at some later point—declare the property with an optional type. Properties of optional type are automatically initialized with a value of nil, indicating that the property is deliberately intended to have “no value yet” during initialization.
+//
+//The following example defines a class called SurveyQuestion, with an optional String property called response:
+
+class SurveryQuestion {
+    
+    let text: String
+    var response: String?
+    init(text: String) {
+        self.text = text
+    }
+    
+    func ask() {
+        print(text)
+    }
+    
+}
+
+let beetsQuest = SurveryQuestion(text: "How aobout beets?")
+beetsQuest.ask()
+
+// Prints "How about beets?"
+beetsQuestion.response = "I also like beets. (But not with cheese.)"
+
+//Default Initializers
+
+//Swift provides a default initializer for any structure or class that provides default values for all of its properties and does not provide at least one initializer itself. The default initializer simply creates a new instance with all of its properties set to their default values.
+//
+
+// Default Initializers
+
+//Swift provides a default initializer for any structure or class that provides default values for all of its properties and does not provide at least one initializer itself. The default initializer simply creates a new instance with all of its properties set to their default values.
+//
+//This example defines a class called ShoppingListItem, which encapsulates the name, quantity, and purchase state of an item in a shopping list:
+
+
+class ShoppingListItem {
+    var name: String?
+    var quantity = 1
+    var purchased = false
+}
+var item = ShoppingListItem()
+
+
+// Because all properties of the ShoppingListItem class have default values, and because it is a base class with no superclass, ShoppingListItem automatically gains a default initializer implementation that creates a new instance with all of its properties set to their default values. (The name property is an optional String property, and so it automatically receives a default value of nil, even though this value is not written in the code.) The example above uses the default initializer for the ShoppingListItem class to create a new instance of the class with initializer syntax, written as ShoppingListItem(), and assigns this new instance to a variable called item.
