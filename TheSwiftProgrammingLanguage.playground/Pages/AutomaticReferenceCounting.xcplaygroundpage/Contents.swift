@@ -63,3 +63,13 @@ reference2 = nil
 
 reference3 = nil
 // Prints "John Appleseed is being deinitialized"
+
+//Strong Reference Cycles Between Class Instances
+
+//In the examples above, ARC is able to track the number of references to the new Person instance you create and to deallocate that Person instance when it’s no longer needed.
+//
+//However, it’s possible to write code in which an instance of a class never gets to a point where it has zero strong references. This can happen if two class instances hold a strong reference to each other, such that each instance keeps the other alive. This is known as a strong reference cycle.
+//
+//You resolve strong reference cycles by defining some of the relationships between classes as weak or unowned references instead of as strong references. This process is described in Resolving Strong Reference Cycles Between Class Instances. However, before you learn how to resolve a strong reference cycle, it’s useful to understand how such a cycle is caused.
+//
+//Here’s an example of how a strong reference cycle can be created by accident. This example defines two classes called Person and Apartment, which model a block of apartments and its residents:
