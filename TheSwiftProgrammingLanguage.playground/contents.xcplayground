@@ -7,5 +7,6 @@
         <page name='Generics'/>
         <page name='Subscripts'/>
         <page name='ErrorHandling'/>
+        <page name='AutomaticReferenceCounting'/>
     </pages>
 </playground>
