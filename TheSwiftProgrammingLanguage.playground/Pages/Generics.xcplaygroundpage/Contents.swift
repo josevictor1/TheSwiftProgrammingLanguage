@@ -107,17 +107,7 @@ struct IntStack {
     }
 }
 
-func showImage(with url: String) -> UIImage{
-    let imageUrl = URL(string: url)
-    let data = try? Data(contentsOf: imageUrl!) //make sure your image in this url does exist, otherwise unwrap in a if let check / try-catch
-    if let dataImage = data, let image = UIImage(data: dataImage) {
-        return image
-    }
-    
-    return UIImage()
-}
-
-showImage(with: "https://docs.swift.org/swift-book/_images/stackPushPop_2x.png")
+ImageDrawer.showImage(with: "https://docs.swift.org/swift-book/_images/stackPushPop_2x.png")
 
 //This structure uses an Array property called items to store the values in the stack. Stack provides two methods, push and pop, to push and pop values on and off the stack. These methods are marked as mutating, because they need to modify (or mutate) the structure’s items array.
 //
@@ -165,7 +155,7 @@ stackOfInt.push(4)
 
 //Here’s how stackOfStrings looks after pushing these four values on to the stack:
 
-showImage(with: "https://docs.swift.org/swift-book/_images/stackPushedFourStrings_2x.png")
+ImageDrawer.showImage(with: "https://docs.swift.org/swift-book/_images/stackPushedFourStrings_2x.png")
 
 //Popping a value from the stack removes and returns the top value, "cuatro":
 
@@ -173,7 +163,7 @@ let fromTheTop = stackOfStrings.pop()
 
 //Here's how the stack looks after popping its top value:
 
-showImage(with: "https://docs.swift.org/swift-book/_images/stackPoppedOneString_2x.png")
+ImageDrawer.showImage(with: "https://docs.swift.org/swift-book/_images/stackPoppedOneString_2x.png")
 
 /*Extending a Generic Type*/
 
