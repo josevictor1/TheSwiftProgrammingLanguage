@@ -213,41 +213,93 @@
 
 // Lets try with weak in both references
 
-class MyPerson {
-    var name: String
-    weak var apartment: MyApartment?
+class Person {
+    
+    let name: String
+    var apartment: Apartment?
     
     init(name: String) {
         self.name = name
+        print("The Person's instance with name \(name) was allocated")
     }
     
     deinit {
-        print("Person with name \(name) was deallocated")
+        print("The Person's instance with name \(name) was deallocated")
     }
 }
 
-
-class MyApartment {
-    var street: String
-    weak var person: MyPerson?
+class Apartment {
     
-    init(street: String) {
-        self.street = street
+    let unit4A: String
+    weak var tenant: Person?
+    
+    init(unit4A: String) {
+        self.unit4A = unit4A
+        print("The Apartment's instace with name \(unit4A) was allocated")
     }
     
     deinit {
-        print("Apartment on street\(street) was dealocated")
+        print("The Apartment's instance with name \(unit4A) was deallocated")
     }
     
 }
 
-var myPerson: MyPerson? = MyPerson(name: "Person1")
-var unit4A: MyApartment? = MyApartment(street: "Street1")
+var apartment: Apartment? = Apartment(unit4A: "San Jose")
+var person: Person? = Person(name: "Steve")
 
-myPerson?.apartment = unit4A
-unit4A?.person = myPerson
+person?.apartment = apartment
+apartment?.tenant = person
 
-unit4A = nil
-myPerson = nil
+//The Apartment's instace with name San Jose was allocated
+//The Person's instance with name Steve was allocated
 
-// Lets
+//Until here... everthing is ok!
+// with strong reference:
+//person = nil
+//apartment = nil
+
+// Its not ok :( . Here we have a strong retain cycle between two objects instance.
+// Let's go upstairs solve this.
+
+// Let's try some different approachs:
+
+//weak
+
+//person = nil
+//apartment = nil
+
+//The Apartment's instace with name San Jose was allocated
+//The Person's instance with name Steve was allocated
+//The Apartment's instance with name San Jose was deallocated
+//The Person's instance with name Steve was deallocated
+
+// We solve the reference cycle here... but .. why?
+// Considering the reference counting, person didn't have any strong reference when we declare the variable tenant as being a weak reference, and so don't increasing the person counting reference. Then the object(person) could be deallocated.
+
+// Here we have some situation, we've assigned nil to person before apartment. What will happen if we change the order?
+
+apartment = nil
+
+// Why apartment wasn't deallocated? The strong reference cycle still exist?
+
+// No the strong reference cycle was broked, but the reference to apartment still being strong. How the strong reference still there the apartment can't be dealocated until it's reference counter reachs zero.
+
+// When person is assingned nil we have apartment deallocation.
+
+person = nil
+
+//M A G I C ...
+//The Apartment's instace with name San Jose was allocated
+//The Person's instance with name Steve was allocated
+//The Person's instance with name Steve was deallocated
+//The Apartment's instance with name San Jose was deallocated
+
+
+//unowned
+
+//Unowned here works in the same way. But we need to rember that: unwoned not consider the reference as optional... than if we use this in the app we could have a crash. It's happens because the system try to use the resource without check it this really still existing. Than when it access that nill object in the memory it get nil! Segmentation fault :( .
+
+
+
+
+
