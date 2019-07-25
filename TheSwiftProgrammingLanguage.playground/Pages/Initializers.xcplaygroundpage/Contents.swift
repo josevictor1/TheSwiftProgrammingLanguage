@@ -309,9 +309,10 @@ struct Edge {
 }
 // Custom init
 let firstEdge = Edge(v1: Vertex(y: 5))
-// Original meberwise init
+// Original memberwise init
 //let secondEdge = Edge(v0: Vertex(x: 3, y: 4), v1: Vertex(x: 7, y: 10))
 // error: Initializers.xcplaygroundpage:309:27: error: extra argument 'v0' in call
 //let secondEdge = Edge(v0: Vertex(x: 3, y: 4), v1: Vertex(x: 7, y: 10))
 //^~~~~~~~~~~~~~~~~~
 // As expected it fails :)
+

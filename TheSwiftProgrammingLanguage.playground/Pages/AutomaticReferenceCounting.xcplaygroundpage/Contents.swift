@@ -295,9 +295,30 @@ person = nil
 //The Apartment's instance with name San Jose was deallocated
 
 
-//unowned
+// unowned
 
-//Unowned here works in the same way. But we need to rember that: unwoned not consider the reference as optional... than if we use this in the app we could have a crash. It's happens because the system try to use the resource without check it this really still existing. Than when it access that nill object in the memory it get nil! Segmentation fault :( .
+//Unowned here works in the same way. But we need to rember that: unwoned don't consider the reference as optional... than if we use this in the app we could have a crash. It's happens because the system try to use the resource without check it this really still existing. Than when it access that nill object in the memory it get nil! Segmentation fault :( .
+// We use unowned when the refered instance have the same life time or longer than the referrer.
+
+class Client {
+    let name: String
+    var creditCard: CreditCard?
+    
+    init(name: String) {
+        self.name = name
+    }
+}
+
+
+class CreditCard {
+    let number: Int
+    var client: Client?
+    
+    init(number: Int) {
+        self.number = number
+    }
+}
+
 
 
 
