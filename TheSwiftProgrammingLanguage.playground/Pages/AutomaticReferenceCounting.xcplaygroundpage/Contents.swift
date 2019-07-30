@@ -306,21 +306,71 @@ class Client {
     
     init(name: String) {
         self.name = name
+        print("The Client with name \(self.name) was allocated")
+    }
+    
+    deinit {
+        print("The Client with name \(self.name) was deallocated")
     }
 }
 
 
 class CreditCard {
     let number: Int
-    var client: Client?
+    unowned var client: Client?
     
     init(number: Int) {
         self.number = number
+        print("The CreditCard with number \(self.number) was allocated")
+    }
+    
+    deinit {
+        print("The CreditCard with number \(number) was deallocated")
     }
 }
 
+var client: Client? = Client(name: "Teste")
+client?.creditCard = CreditCard(number: 1234566543333)
 
+//client = nil // the referenced object needs to have equal or longer life cycle
+//print(creditCard?.client)
 
+//Playground execution failed:
+//
+//error: Execution was interrupted, reason: signal SIGABRT.
+//The process has been left at the point where it was interrupted, use "thread return -x" to return to the state before expression evaluation.
+client = nil
+// There is unsafe unowned... we can use this by adding the unsafe word under parenteses unowned(unsafe).
 
+// Scenarios:
+//  1 - nil - nil
+//  2 - nil - not nil
+//  3 - not nil - not nil
 
+//Soution by scenarios:
+// 1 - use weak on one instance
+// 2 - use unowned on one instance
+// 3 - combine unowned with implicitly unwrapped optional property on the other class.
+
+class City {
+    let name: String
+    unowned let country: Country
+    
+    init(name: String, country: Country) {
+        self.name = name
+        self.country = country
+    }
+}
+
+class Country {
+    let name: String
+    var city: City!
+    
+    init(name: String, cityName: String) {
+        self.name = name
+        self.city = City(name: cityName, country: self)
+    }
+}
+
+let country = Country(name: "Teste", cityName: "Teste Capital")
 
