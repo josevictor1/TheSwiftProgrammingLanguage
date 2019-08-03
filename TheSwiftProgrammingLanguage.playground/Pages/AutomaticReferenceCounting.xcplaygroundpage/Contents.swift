@@ -298,8 +298,3 @@ person = nil
 //unowned
 
 //Unowned here works in the same way. But we need to rember that: unwoned not consider the reference as optional... than if we use this in the app we could have a crash. It's happens because the system try to use the resource without check it this really still existing. Than when it access that nill object in the memory it get nil! Segmentation fault :( .
-
-
-
-
-
