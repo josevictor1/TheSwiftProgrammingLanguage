@@ -9,5 +9,6 @@
         <page name='ErrorHandling'/>
         <page name='AutomaticReferenceCounting'/>
         <page name='Closures'/>
+        <page name='MemorySafety'/>
     </pages>
 </playground>

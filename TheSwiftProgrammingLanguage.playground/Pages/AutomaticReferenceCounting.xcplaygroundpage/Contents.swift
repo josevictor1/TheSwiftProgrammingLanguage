@@ -475,3 +475,6 @@ ImagePresenter.showImage(with: "https://docs.swift.org/swift-book/_images/closur
 
 // To solve/break reference cycle we can write the capture list [unowned self]... the capture list defines the roles that will be applied in the over the captured references
 
+paragraph = nil
+
+
