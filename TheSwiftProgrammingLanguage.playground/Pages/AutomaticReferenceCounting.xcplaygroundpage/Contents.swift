@@ -439,7 +439,7 @@ class HTMLElement {
     let name: String
     let text: String?
     
-    lazy var asHTML: () -> String = {
+    lazy var asHTML: () -> String = { [unowned self] in
         if let text = self.text {
             return "<\(self.name)>\(text)</\(self.name)>"
         } else {
@@ -473,4 +473,5 @@ ImagePresenter.showImage(with: "https://docs.swift.org/swift-book/_images/closur
 
 // The strong referenc cycle is created when the closure refers to HTMLElement instance by self. reference. Is almost the same way as strong reference betwen two object instances.
 
+// To solve/break reference cycle we can write the capture list [unowned self]... the capture list defines the roles that will be applied in the over the captured references
 
