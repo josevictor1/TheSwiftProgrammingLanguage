@@ -374,3 +374,107 @@ class Country {
 
 let country = Country(name: "Teste", cityName: "Teste Capital")
 
+// Breaking Strong Reference Cycle in closures
+
+//NOTE
+//
+//The asHTML property is declared as a lazy property, because it’s only needed if and when the element actually needs to be rendered as a string value for some HTML output target. The fact that asHTML is a lazy property means that you can refer to self within the default closure, because the lazy property will not be accessed until after initialization has been completed and self is known to exist.
+
+// Can we access self inside the default clojure?
+class MyHTMLElement {
+
+    let name: String
+    lazy var asHTML: (() -> String) = {
+        return "<\(self.name)>"
+    }
+
+    init(name: String) {
+        self.name = name
+    }
+
+}
+
+let myHeading = MyHTMLElement(name: "h1")
+print(myHeading.asHTML())
+let myDefaultText = "Test"
+myHeading.asHTML = {
+    return "<\(myHeading.name)> \(myDefaultText) <\(myHeading.name)>"
+}
+print(myHeading.asHTML())
+// Oks that works because the example said... but if asHTML isn't a lazy property?
+//
+//class HTMLElement {
+//
+//    let name: String
+//    var asHTML: (() -> String) = {
+//        return "<\(self.name)>"
+//    }
+//
+//    init(name: String) {
+//        self.name = name
+//    }
+//
+//}
+//
+//let heading = HTMLElement(name: "h1")
+//print(heading.asHTML())
+////lets test it now
+//let defaultText = "Test"
+//heading.asHTML = {
+//    return "<\(heading.name)>\(defaultText)<\(heading.name)>"
+//}
+//print(heading.asHTML())
+//error: AutomaticReferenceCounting.xcplaygroundpage:407:20: error: use of unresolved identifier 'self'
+//return "<\(self.name)>"
+// First error: you can access name in the asHTML if it isn't lazy
+// We won't be able to access self.name inside the closure on HTMLElement because name in not initialized when we define asHTML.
+// Any way you can still accessing the deaultText inside that definition:
+//heading.asHTML = {
+//    return "<\(heading.name)>\(defaultText)<\(heading.name)>"
+//}
+// Because here name is already initialized!
+
+class HTMLElement {
+    
+    let name: String
+    let text: String?
+    
+    lazy var asHTML: () -> String = { [unowned self] in
+        if let text = self.text {
+            return "<\(self.name)>\(text)</\(self.name)>"
+        } else {
+            return "<\(self.name) />"
+        }
+    }
+    
+    init(name: String, text: String? = nil) {
+        self.name = name
+        self.text = text
+    }
+    
+    deinit {
+        print("\(name) is being deinitialized")
+    }
+    
+}
+
+let heading = HTMLElement(name: "h1")
+let defaultText = "some default text"
+heading.asHTML = {
+    return "<\(heading.name)>\(heading.text ?? defaultText)</\(heading.name)>"
+}
+print(heading.asHTML())
+
+var paragraph: HTMLElement? = HTMLElement(name: "p", text: "hello, world")
+print(paragraph!.asHTML())
+
+// Create the strong reference cycle
+ImagePresenter.showImage(with: "https://docs.swift.org/swift-book/_images/closureReferenceCycle01_2x.png")
+
+// The strong referenc cycle is created when the closure refers to HTMLElement instance by self. reference. Is almost the same way as strong reference betwen two object instances.
+
+// To solve/break reference cycle we can write the capture list [unowned self]... the capture list defines the roles that will be applied in the over the captured references
+
+paragraph = nil
+
+
