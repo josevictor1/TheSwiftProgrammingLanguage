@@ -52,10 +52,18 @@ ImagePresenter.showImage(with: "https://docs.swift.org/swift-book/_images/memory
 
 //GAPS:
 // - What is about memory safety ?
+//Memory safety is about access memory location without access conflicts. The access conflicts occurs when some diferent codes try to access (read/write) the same location... and the sometimes change this location (write) simutaneously
 // Memory safety is about multiple access in the memory location. Swift look after you in the most part of the cases given different permission acess to acessed location mamory. This way we have memory safety.
 // - Which are the environment caracteristics that colaborate to this happens?
+//diferent codes try to access (read/write) the same location... and the sometimes change this location (write) simutaneously
 // - Just happens in this sitiuation ?
+// could happen in overlap in long-term acess
 // - Why this just happens with global variables?
+// It no just about global variables ... is about inout parammeters too...
+
+// There some context that we can have problems with memory safety: access permition, location of access and time of access.
+
+// When we have conflicting access with in-out parameters ?
 
 
 
