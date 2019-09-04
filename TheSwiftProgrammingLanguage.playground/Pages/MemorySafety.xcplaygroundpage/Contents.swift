@@ -65,6 +65,14 @@ ImagePresenter.showImage(with: "https://docs.swift.org/swift-book/_images/memory
 
 // When we have conflicting access with in-out parameters ?
 
+var stepSize = 1
 
+func increment(_ number: inout Int) {
+    number += stepSize
+}
 
+increment(&stepSize)
+//Simultaneous accesses to 0x11f183050, but modification requires exclusive access.
+//Previous access (a modification) started at  (0x11f184441).
 
+// We have conflicting access with in-out parameters when we try to access the same memory location twice. In this case, the function will have write access to all in-out parameters after evaluating non-in-out parameters. Long-term access will prevail in the entire duration of that functions call.
