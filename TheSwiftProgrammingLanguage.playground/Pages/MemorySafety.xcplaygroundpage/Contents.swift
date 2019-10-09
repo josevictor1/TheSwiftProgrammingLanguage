@@ -142,3 +142,7 @@ oscar.shareHealth(with: &maria) // OK
 //^~~~~
 
 //As the editor show us, by write(modification). That way, we get an error because write(modification) requires exclusive access. When we pass oscar as a parameter to share health method, we are trying to get write access two times: when we use inout parameter and when we access self inside the method.
+
+//Conflicting Access to Properties
+
+
