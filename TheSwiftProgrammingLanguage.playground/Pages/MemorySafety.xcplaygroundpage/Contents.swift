@@ -98,8 +98,47 @@ func balance(_ x: inout Int, _ y: inout Int) {
 var playerOneScore = 42
 var playerTwoScore = 30
 balance(&playerOneScore, &playerTwoScore)
-// balance(&playerOneScore, &playerOneScore)
+// balance(&playerOneScore, &playerOneScore) Error!
+// This conflict occurs because the compiler try to give wirte access to times... whe access playerOneScore by x and y.
+// we are trying to acess the same location at the same time
 
+//Conflicting Access To Self Method
 
+struct Player {
+    var name: String
+    var health: Int
+    var energy: Int
+    
+    static let maxHealth = 10
+    mutating func restoreHealth() {
+        health = Player.maxHealth
+    }
+}
 
+extension Player {
+    mutating func shareHealth(with teammate: inout Player) {
+        balance(&teammate.health, &health)
+    }
+}
 
+var oscar = Player(name: "Oscar", health: 10, energy: 10)
+var maria = Player(name: "Maria", health: 5, energy: 10)
+oscar.shareHealth(with: &maria) // OK
+
+//That's ok. The compiler gives write access to inout parameter and the accessed parameter is maria. Inside the method, the oscar is accessed by self-reference, and it's ok because we are accessing it for the first time. There's no conflict on the overlap.
+
+//oscar.shareHealth(with: &oscar)
+//The editor:
+//Inout arguments are not allowed to alias each other
+//Overlapping accesses to 'oscar', but modification requires exclusive access; consider copying to a local variable
+
+//The compiler:
+//error: MemorySafety.xcplaygroundpage:130:25: error: inout arguments are not allowed to alias each other
+//oscar.shareHealth(with: &oscar)
+//                        ^~~~~~
+//
+//MemorySafety.xcplaygroundpage:130:1: note: previous aliasing argument
+//oscar.shareHealth(with: &oscar)
+//^~~~~
+
+//As the editor show us, by write(modification). That way, we get an error because write(modification) requires exclusive access. When we pass oscar as a parameter to share health method, we are trying to get write access two times: when we use inout parameter and when we access self inside the method.
