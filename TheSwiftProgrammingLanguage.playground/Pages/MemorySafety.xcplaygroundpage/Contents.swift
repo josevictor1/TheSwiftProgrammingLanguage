@@ -145,4 +145,29 @@ oscar.shareHealth(with: &maria) // OK
 
 //Conflicting Access to Properties
 
+//Types like structures, and enumerations are made up of individual constituent values, such as the properties of a structure or the elements of a tuple. Because they are value type mutaiting any piece of the value mutates the whole value. Then if we try to access structure propertie with write access, we will obtain the access to the entire propertie.
 
+struct Circle {
+    var radius: Int
+    var circunference: Int
+}
+
+var circle = Circle(radius: 12, circunference: 10)
+
+//balance(&circle.radius, &circle.circunference)//Error
+// When it try to overlapping we get a access conflict
+
+// But there some situations that we can overlapping safety. To do that is necessary prove to the compiler that is everything ok.
+// Situations:
+// You're acessing only stored properties of an instance, not computed properties or class properties.
+// The structure is the value of a local variable, not a global variable.
+// The structure is either not captured by any closures or it's captured only by nonescaping closures.
+
+//Ex:
+
+func someFunction() {
+    var circle = Circle(radius: 12, circunference: 10)
+    balance(&circle.radius, &circle.circunference)
+}
+
+someFunction()
