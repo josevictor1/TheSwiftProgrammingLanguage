@@ -10,5 +10,7 @@
         <page name='AutomaticReferenceCounting'/>
         <page name='Closures'/>
         <page name='MemorySafety'/>
+        <page name='TheBasics'/>
+        <page name='AcessControl'/>
     </pages>
 </playground>
