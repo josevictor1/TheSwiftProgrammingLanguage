@@ -29,13 +29,6 @@ import Foundation
 // How to use it ?
 // You will use the reserved words as a first word on the statement.
 
-open class Batoque {
-    
-}
-
-
-
-
 // When to use it ?
 // When you need to resctrict the access to some implementation or hide some piece of code.
 
@@ -51,4 +44,5 @@ open class Batoque {
 
     // - Generics
 
-//: [Next](@next)
+// Open vs Public
+// Open allows subclassing but public don't
